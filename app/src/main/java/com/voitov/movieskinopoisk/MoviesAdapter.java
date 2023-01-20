@@ -4,6 +4,7 @@ import android.graphics.RenderEffect;
 import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,23 +12,18 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesViewHolder> {
-    private List<Movie> movies = new ArrayList<>();
+public class MoviesAdapter extends ListAdapter<Movie, MoviesAdapter.MoviesViewHolder> {
     private OnReachEndListener onReachEndListener;
     private OnMovieClickListener onMovieClickListener;
 
-    public void setMovies(List<Movie> movies) {
-        this.movies = movies;
-        notifyDataSetChanged();
+    public MoviesAdapter() {
+        super(new MovieItemCallback());
     }
 
     public void setOnReachEnd(OnReachEndListener onReachEndListener) {
@@ -38,17 +34,49 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesView
         this.onMovieClickListener = onMovieClickListener;
     }
 
+    public int getItemViewType(int position) {
+        Movie movie = getItem(position);
+        if (movie.isBlurred()) {
+            return VIEW_TYPE_BLURRED_CARD;
+        } else {
+            return VIEW_TYPE_DEFAULT_CARD;
+        }
+    }
+
     @NonNull
     @Override
     public MoviesViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.movie_item, parent, false);
-        return new MoviesViewHolder(view);
+        Log.d(TAG, "OnCreateViewHolder count1: " + (++count1));
+        int layoutResId;
+
+        if (viewType == VIEW_TYPE_BLURRED_CARD) {
+            layoutResId = R.layout.movie_item_blurred;
+        } else if (viewType == VIEW_TYPE_DEFAULT_CARD) {
+            layoutResId = R.layout.movie_item;
+        } else {
+            throw new RuntimeException("There is no view type exists: " + viewType);
+        }
+
+        View view = LayoutInflater.from(parent.getContext()).inflate(layoutResId, parent, false);
+        MoviesViewHolder holder = new MoviesViewHolder(view);
+
+        if (viewType == VIEW_TYPE_BLURRED_CARD) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                {
+                    holder.imageViewPoster.setRenderEffect(RenderEffect.createBlurEffect(15f, 15f, Shader.TileMode.MIRROR));
+                }
+            } else {
+                holder.imageViewPoster.setBackgroundColor(ContextCompat.getColor(parent.getContext(), R.color.white));
+                holder.imageViewPoster.setImageAlpha(75);
+            }
+        }
+        return holder;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.S)
     @Override
     public void onBindViewHolder(@NonNull MoviesViewHolder holder, int position) {
-        Movie movie = movies.get(position);
+        Log.d(TAG, "OnBindViewHolder count2: " + (++count2));
+        Movie movie = getItem(position);
         Glide.with(holder.itemView)
                 .load(movie.getPoster().getUrl())
                 .into(holder.imageViewPoster);
@@ -70,18 +98,24 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesView
         Drawable ratingBackground = ContextCompat.getDrawable(holder.itemView.getContext(), backgroundId);
         textViewRate.setBackground(ratingBackground);
 
-        if (position > movies.size() - 6 && onReachEndListener != null) {
-            onReachEndListener.onReachEnd();
+        if (movie.isBlurred()) {
+            holder.textViewBriefDescription.setText(movie.getBriefDescription());
         }
 
-        holder.imageViewPoster.setRenderEffect(null);
-        holder.textViewBriefDescription.setVisibility(View.GONE);
+        if (position > getItemCount() - 6 && onReachEndListener != null) {
+            onReachEndListener.onReachEnd();
+        }
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (onMovieClickListener != null) {
-                    onMovieClickListener.onMovieClick(movie);
+                if (movie.isBlurred()) {
+                    movie.blur();
+                    notifyItemChanged(holder.getAdapterPosition());
+                } else {
+                    if (onMovieClickListener != null) {
+                        onMovieClickListener.onMovieClick(movie);
+                    }
                 }
             }
         });
@@ -89,19 +123,11 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesView
         holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                holder.imageViewPoster.setRenderEffect(RenderEffect.createBlurEffect(50f, 50f, Shader.TileMode.MIRROR));
-                holder.textViewBriefDescription.setVisibility(View.VISIBLE);
-                holder.textViewRate.setVisibility(View.GONE);
-                holder.textViewBriefDescription.setText(movie.getBriefDescription());
+                movie.blur();
+                notifyItemChanged(holder.getAdapterPosition());
                 return true;
             }
         });
-
-    }
-
-    @Override
-    public int getItemCount() {
-        return movies.size();
     }
 
     public static class MoviesViewHolder extends RecyclerView.ViewHolder {
@@ -124,4 +150,10 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesView
     public interface OnMovieClickListener {
         public void onMovieClick(Movie movie);
     }
+
+    private static final int VIEW_TYPE_DEFAULT_CARD = 100;
+    private static final int VIEW_TYPE_BLURRED_CARD = 101;
+    public static final String TAG = "MoviesAdapter";
+    public static int count1 = 0;
+    public static int count2 = 0;
 }

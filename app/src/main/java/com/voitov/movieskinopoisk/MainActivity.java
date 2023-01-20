@@ -1,10 +1,8 @@
 package com.voitov.movieskinopoisk;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -43,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChanged(List<Movie> movies) {
                 Log.d(TAG, movies.toString());
-                moviesAdapter.setMovies(movies);
+                moviesAdapter.submitList(movies);
             }
         });
 
@@ -87,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate( R.menu.menu_item, menu);
+        getMenuInflater().inflate(R.menu.menu_item, menu);
         return true;
     }
 

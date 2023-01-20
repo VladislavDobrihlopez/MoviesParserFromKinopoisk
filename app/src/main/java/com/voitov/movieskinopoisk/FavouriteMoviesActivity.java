@@ -27,7 +27,7 @@ public class FavouriteMoviesActivity extends AppCompatActivity {
         viewModel.getMovies().observe(this, new Observer<List<Movie>>() {
             @Override
             public void onChanged(List<Movie> movies) {
-                adapter.setMovies(movies);
+                adapter.submitList(movies);
             }
         });
     }

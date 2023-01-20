@@ -2,11 +2,13 @@ package com.voitov.movieskinopoisk;
 
 import androidx.room.Embedded;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 @Entity(tableName = "favourite_movies")
 public class Movie implements Serializable {
@@ -27,6 +29,8 @@ public class Movie implements Serializable {
     @PrimaryKey
     @SerializedName("id")
     private final int id;
+    @Ignore
+    private boolean isBlurred;
 
     public Movie(String name, Poster poster, Rating rating, String description, String briefDescription, int year, int id) {
         this.name = name;
@@ -36,6 +40,15 @@ public class Movie implements Serializable {
         this.briefDescription = briefDescription;
         this.year = year;
         this.id = id;
+        isBlurred = false;
+    }
+
+    public void blur() {
+        isBlurred = !isBlurred;
+    }
+
+    public boolean isBlurred() {
+        return isBlurred;
     }
 
     public String getName() {
@@ -64,6 +77,19 @@ public class Movie implements Serializable {
 
     public int getId() {
         return id;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Movie movie = (Movie) o;
+        return year == movie.year && id == movie.id && Objects.equals(name, movie.name) && Objects.equals(poster, movie.poster) && Objects.equals(rating, movie.rating) && Objects.equals(description, movie.description) && Objects.equals(briefDescription, movie.briefDescription);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, poster, rating, description, briefDescription, year, id);
     }
 
     @Override
