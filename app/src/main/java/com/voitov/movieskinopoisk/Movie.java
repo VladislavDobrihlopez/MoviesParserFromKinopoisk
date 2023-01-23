@@ -104,4 +104,8 @@ public class Movie implements Serializable {
                 ", id=" + id +
                 '}';
     }
+
+    public static final int AWESOME_RATING = 7;
+    public static final int NORMAL_RATING = 5;
+    public static final int AWFUL_RATING = 0;
 }

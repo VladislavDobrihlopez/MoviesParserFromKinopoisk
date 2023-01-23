@@ -34,7 +34,9 @@ public class MainActivity extends AppCompatActivity {
 
         MoviesAdapter moviesAdapter = new MoviesAdapter();
         recyclerViewMovies.setAdapter(moviesAdapter);
-        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(this, 2);
+
+        int columns = getResources().getInteger(R.integer.movie_columns);
+        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(this, columns);
         recyclerViewMovies.setLayoutManager(layoutManager);
 
         viewModel.getMovies().observe(this, new Observer<List<Movie>>() {
