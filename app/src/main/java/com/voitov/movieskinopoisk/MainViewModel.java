@@ -8,6 +8,7 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -67,12 +68,13 @@ public class MainViewModel extends AndroidViewModel {
                     public void accept(MovieResponse response) throws Throwable {
                         page++;
                         List<Movie> loadedMovies = movies.getValue();
+                        List<Movie> resultMovies = new ArrayList<>();
                         if (loadedMovies != null) {
-                            loadedMovies.addAll(response.getMovies());
-                        } else {
-                            loadedMovies = response.getMovies();
+                            resultMovies.addAll(loadedMovies);
+
                         }
-                        movies.setValue(loadedMovies);
+                        resultMovies.addAll(response.getMovies());
+                        movies.setValue(resultMovies);
                         Log.d(TAG, "loaded page №" + (page - 1));
                     }
                 }, new Consumer<Throwable>() {
