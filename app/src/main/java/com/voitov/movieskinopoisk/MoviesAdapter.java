@@ -1,5 +1,7 @@
 package com.voitov.movieskinopoisk;
 
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.RenderEffect;
 import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
@@ -63,11 +65,24 @@ public class MoviesAdapter extends ListAdapter<Movie, MoviesAdapter.MoviesViewHo
         if (viewType == VIEW_TYPE_BLURRED_CARD) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 {
-                    holder.imageViewPoster.setRenderEffect(RenderEffect.createBlurEffect(15f, 15f, Shader.TileMode.MIRROR));
+                    holder.imageViewPoster.setRenderEffect(RenderEffect.createBlurEffect(
+                            IMAGE_VIEW_POSTER_BLUR_EFFECT_RADIUS_X,
+                            IMAGE_VIEW_POSTER_BLUR_EFFECT_RADIUS_Y,
+                            Shader.TileMode.MIRROR
+                    ));
+                    holder.imageViewPoster.setColorFilter(
+                            Color.rgb(IMAGE_VIEW_POSTER_DARK_FILTER_RGB_RED,
+                                    IMAGE_VIEW_POSTER_DARK_FILTER_RGB_GREEN,
+                                    IMAGE_VIEW_POSTER_DARK_FILTER_RGB_BLUE),
+                            PorterDuff.Mode.MULTIPLY
+                    );
                 }
             } else {
-                holder.imageViewPoster.setBackgroundColor(ContextCompat.getColor(parent.getContext(), R.color.white));
-                holder.imageViewPoster.setImageAlpha(75);
+                holder.imageViewPoster.setBackgroundColor(ContextCompat.getColor(
+                        parent.getContext(),
+                        R.color.white
+                ));
+                holder.imageViewPoster.setImageAlpha(IMAGE_VIEW_POSTER_ALPHA);
             }
         }
         return holder;
@@ -82,14 +97,16 @@ public class MoviesAdapter extends ListAdapter<Movie, MoviesAdapter.MoviesViewHo
                 .into(holder.imageViewPoster);
         TextView textViewRate = holder.textViewRate;
 
-        textViewRate.setText(String.valueOf(movie.getRating().getKinopoisk()).substring(0, 3));
+        int from = 0;
+        int until = 3;
+        textViewRate.setText(String.valueOf(movie.getRating().getKinopoisk()).substring(from, until));
 
         double ratingOnKinopoisk = movie.getRating().getKinopoisk();
         int backgroundId;
 
-        if (ratingOnKinopoisk >= 7) {
+        if (ratingOnKinopoisk >= Movie.AWESOME_RATING) {
             backgroundId = R.drawable.awesome_rating_circle;
-        } else if (ratingOnKinopoisk > 5) {
+        } else if (ratingOnKinopoisk > Movie.NORMAL_RATING) {
             backgroundId = R.drawable.normal_rating_circle;
         } else {
             backgroundId = R.drawable.awful_rating_circle;
@@ -102,7 +119,7 @@ public class MoviesAdapter extends ListAdapter<Movie, MoviesAdapter.MoviesViewHo
             holder.textViewBriefDescription.setText(movie.getBriefDescription());
         }
 
-        if (position > getItemCount() - 6 && onReachEndListener != null) {
+        if (position > getItemCount() - MOVIES_REMAINING_BEFORE_NEW_REQUEST && onReachEndListener != null) {
             onReachEndListener.onReachEnd();
         }
 
@@ -153,6 +170,13 @@ public class MoviesAdapter extends ListAdapter<Movie, MoviesAdapter.MoviesViewHo
 
     private static final int VIEW_TYPE_DEFAULT_CARD = 100;
     private static final int VIEW_TYPE_BLURRED_CARD = 101;
+    public static final int IMAGE_VIEW_POSTER_ALPHA = 75;
+    public static final float IMAGE_VIEW_POSTER_BLUR_EFFECT_RADIUS_X = 17f;
+    public static final float IMAGE_VIEW_POSTER_BLUR_EFFECT_RADIUS_Y = 17f;
+    public static final int IMAGE_VIEW_POSTER_DARK_FILTER_RGB_RED = 90;
+    public static final int IMAGE_VIEW_POSTER_DARK_FILTER_RGB_GREEN = 90;
+    public static final int IMAGE_VIEW_POSTER_DARK_FILTER_RGB_BLUE = 90;
+    public static final int MOVIES_REMAINING_BEFORE_NEW_REQUEST = 8;
     public static final String TAG = "MoviesAdapter";
     public static int count1 = 0;
     public static int count2 = 0;

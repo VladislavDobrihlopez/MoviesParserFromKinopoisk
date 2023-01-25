@@ -42,7 +42,8 @@ public class FavouriteMoviesActivity extends AppCompatActivity {
             }
         });
         recyclerViewMovies.setAdapter(adapter);
-        recyclerViewMovies.setLayoutManager(new GridLayoutManager(this, 2));
+        int columns = getResources().getInteger(R.integer.movie_columns);
+        recyclerViewMovies.setLayoutManager(new GridLayoutManager(this, columns));
     }
 
     public static Intent newIntent(Context context) {
