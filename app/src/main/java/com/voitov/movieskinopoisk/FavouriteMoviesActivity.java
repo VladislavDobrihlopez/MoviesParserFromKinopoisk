@@ -38,6 +38,7 @@ public class FavouriteMoviesActivity extends AppCompatActivity {
             public void onChanged(List<Movie> movies) {
                 if (bundledMovies == null) {
                     adapter.submitList(movies);
+                    bundledMovies = new ArrayList<>(movies);
                 } else if (!movies.equals(bundledMovies)) {
                     List<Movie> moviesForAdapter = new ArrayList<>();
                     for (Movie bundledMovie : bundledMovies) {
