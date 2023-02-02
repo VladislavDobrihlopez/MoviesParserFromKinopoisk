@@ -3,6 +3,7 @@ package com.voitov.movieskinopoisk;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class Rating implements Serializable {
     @SerializedName("kp")
@@ -28,6 +29,19 @@ public class Rating implements Serializable {
 
     public double getFilmCritics() {
         return filmCritics;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Rating rating = (Rating) o;
+        return Double.compare(rating.kinopoisk, kinopoisk) == 0 && Double.compare(rating.imdb, imdb) == 0 && Double.compare(rating.filmCritics, filmCritics) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(kinopoisk, imdb, filmCritics);
     }
 
     @Override
