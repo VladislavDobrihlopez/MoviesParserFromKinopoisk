@@ -3,6 +3,7 @@ package com.voitov.movieskinopoisk;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class Poster implements Serializable {
     @SerializedName("url")
@@ -21,5 +22,18 @@ public class Poster implements Serializable {
         return "Poster{" +
                 "url='" + url + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Poster poster = (Poster) o;
+        return Objects.equals(url, poster.url);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(url);
     }
 }

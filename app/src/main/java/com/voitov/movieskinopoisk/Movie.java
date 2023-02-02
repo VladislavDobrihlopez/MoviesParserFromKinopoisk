@@ -32,6 +32,10 @@ public class Movie implements Serializable {
     @Ignore
     private boolean isBlurred;
 
+    public void setBlurred(boolean blurred) {
+        isBlurred = blurred;
+    }
+
     public Movie(String name, Poster poster, Rating rating, String description, String briefDescription, int year, int id) {
         this.name = name;
         this.poster = poster;
@@ -84,7 +88,14 @@ public class Movie implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Movie movie = (Movie) o;
-        return year == movie.year && id == movie.id && Objects.equals(name, movie.name) && Objects.equals(poster, movie.poster) && Objects.equals(rating, movie.rating) && Objects.equals(description, movie.description) && Objects.equals(briefDescription, movie.briefDescription);
+        boolean f1 = year == movie.year;
+        boolean f2 = id == movie.id;
+        boolean f3 = Objects.equals(name, movie.name);
+        boolean f4 = Objects.equals(poster, movie.poster);
+        boolean f5 = Objects.equals(rating, movie.rating);
+        boolean f6 = Objects.equals(description, movie.description);
+        boolean f7 = Objects.equals(briefDescription, movie.briefDescription);
+        return f1 && f2 && f3 && f4 && f5 && f6 && f7;
     }
 
     @Override
